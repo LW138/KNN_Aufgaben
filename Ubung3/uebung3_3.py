@@ -87,15 +87,15 @@ def train(train_images, train_labels, weights, biases, learning_rate, epochs):
 
 
         if j % 10 == 0:
-            print("Progress: ", j, "/", epochs, "\tLoss: ", cross_entropy(expected_output, output))
+            print("Progress: ", j+10, "/", epochs, "\tLoss: ", cross_entropy(expected_output, output))
 
 
 learning_rate = 0.1
 
 # Create a network of shape 784 - 256 - 256 - 10
 input_layer = 784
-first_hidden_layer = 2 #256
-second_hidden_layer = 2 #256
+first_hidden_layer = 16 #256
+second_hidden_layer = 16 #256
 output_layer = 10
 
 weights = [np.random.rand(input_layer, first_hidden_layer) * 0.01, # * 0.01 to keep the weights small
@@ -116,7 +116,7 @@ print("Accuracy: ", predict(test_images[:100], test_labels[:100], weights, biase
 
 """
 1. Welche Accuracy kann mit 784 - 256 - 256 - 10 erreicht werden?
-    ~95% Accuracy geschätzt (loss war 0,0003, aber nicht fertig trainiert). Bei Loss = 1,6 bereits 70% Accuracy
+    ~99% Accuracy geschätzt (loss war 0,0003, aber nicht fertig trainiert). Bei Loss = 1,6 bereits 70% Accuracy
     
 2. Welche Auswirkung hat eine Vergrößerung des Netzes?
     Die Accuracy steigt, da das Netz mehr Parameter hat, um die Daten zu lernen. Allerdings gibt es ein Overfitting, wenn das Netz zu groß ist.
@@ -124,7 +124,12 @@ print("Accuracy: ", predict(test_images[:100], test_labels[:100], weights, biase
     
 3. Was ist das kleinste Netz, das noch funktioniert?
     Getestet mit: Learning Rate: 0.1, Epochs: 100, Trainingsdaten: 10000, Testdaten: 100
-    
+    784 - 256 - 256 - 10 => Accuracy: 97% Loss: 0,00047
+    784 - 128 - 128 - 10 => Accuracy: 97%
+    784 - 64 - 64 - 10 => Accuracy: 96%
+    784 - 32 - 32 - 10 => Accuracy: 96% Loss: 0,0059
+    784 - 16 - 16 - 10 => Accuracy: 89% Loss 0,0039
     784 - 8 - 8 - 10 => Accuracy: 90%
-    784 - 2 - 2 - 10 => Accuracy: 79%
+    784 - 4 - 4 - 10 => Accuracy: 79%
+    784 - 2 - 2 - 10 => Accuracy: 23%
 """
