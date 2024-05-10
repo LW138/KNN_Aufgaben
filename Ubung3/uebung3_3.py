@@ -11,8 +11,8 @@ def cross_entropy(y_true, y_pred):
 def predict(test_images, test_labels, weights, biases):
     correct_predictions = 0
     for i in range(len(test_images)):
-        x = (test_images[i] / 255).flatten()
-        output, _, _ = forward(x, weights, biases)
+        input = (test_images[i] / 255).flatten()
+        _, _, output = forward(input, weights, biases)
         predicted_label = np.argmax(output)
         actual_label = test_labels[i]
         print("Predicted: ", predicted_label, "Actual: ", actual_label)
@@ -52,7 +52,7 @@ def backward(weights, layer1, layer2, output, expected_output):
     return layer1_delta, layer2_delta, output_delta
 
 
-def update(input, layer1, layer2, output_delta, layer1_delta, layer2_delta, weights, biases):
+def update(input, layer1, layer2, output_delta, layer1_delta, layer2_delta, weights, biases, learning_rate):
     # weights[2] = learning_rate * (256x1 * 10x1) = 256x10
     weights[2] += learning_rate * np.outer(layer2, output_delta)
     biases[2] += learning_rate * output_delta
@@ -68,9 +68,6 @@ def update(input, layer1, layer2, output_delta, layer1_delta, layer2_delta, weig
 
 def train(train_images, train_labels, weights, biases, learning_rate, epochs):
     for j in range(epochs):
-        if j % 10 == 0:
-            print("Loss: ", cross_entropy(expected_output, output))
-
         for i in range(len(train_images)):
             # Normalize image values (0 to 255) in a range from 0 to 1 and convert the matrix from 28x28 to 784x1
             input = (train_images[i] / 255).flatten()
@@ -89,12 +86,16 @@ def train(train_images, train_labels, weights, biases, learning_rate, epochs):
             update(input, layer1, layer2, output_delta, layer1_delta, layyer2_delta, weights, biases, learning_rate)
 
 
+        if j % 10 == 0:
+            print("Progress: ", j, "/", epochs, "\tLoss: ", cross_entropy(expected_output, output))
+
+
 learning_rate = 0.1
 
 # Create a network of shape 784 - 256 - 256 - 10
 input_layer = 784
-first_hidden_layer = 32 #256
-second_hidden_layer = 32 #256
+first_hidden_layer = 2 #256
+second_hidden_layer = 2 #256
 output_layer = 10
 
 weights = [np.random.rand(input_layer, first_hidden_layer) * 0.01, # * 0.01 to keep the weights small
@@ -108,9 +109,22 @@ mnist = tf.keras.datasets.mnist
 (train_images, train_labels), (test_images, test_labels) = mnist.load_data()
 
 # Train the network with the first 10000 images for a faster training
-train(train_images[:10000], train_labels[:10000], weights, biases, learning_rate, 10)
+train(train_images[:10000], train_labels[:10000], weights, biases, learning_rate, 100)
 
 
-print(predict(test_images[:10], test_labels[:10], weights, biases))
+print("Accuracy: ", predict(test_images[:100], test_labels[:100], weights, biases))
 
-
+"""
+1. Welche Accuracy kann mit 784 - 256 - 256 - 10 erreicht werden?
+    ~95% Accuracy geschätzt (loss war 0,0003, aber nicht fertig trainiert). Bei Loss = 1,6 bereits 70% Accuracy
+    
+2. Welche Auswirkung hat eine Vergrößerung des Netzes?
+    Die Accuracy steigt, da das Netz mehr Parameter hat, um die Daten zu lernen. Allerdings gibt es ein Overfitting, wenn das Netz zu groß ist.
+    Allerdings steigt auch die Rechenzeit und der Speicherbedarf.
+    
+3. Was ist das kleinste Netz, das noch funktioniert?
+    Getestet mit: Learning Rate: 0.1, Epochs: 100, Trainingsdaten: 10000, Testdaten: 100
+    
+    784 - 8 - 8 - 10 => Accuracy: 90%
+    784 - 2 - 2 - 10 => Accuracy: 79%
+"""
