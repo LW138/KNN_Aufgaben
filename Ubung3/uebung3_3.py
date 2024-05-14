@@ -4,6 +4,7 @@ import tensorflow as tf
 def sigmoid(x):
     return 1 / (1 + np.exp(-x / 1))
 
+
 def cross_entropy(y_true, y_pred):
     y_pred = np.clip(y_pred, 1e-9, 1 - 1e-9)
     return -np.sum(y_true * np.log(y_pred))
@@ -123,6 +124,7 @@ print("Accuracy: ", predict(test_images[:100], test_labels[:100], weights, biase
     Allerdings steigt auch die Rechenzeit und der Speicherbedarf.
     
 3. Was ist das kleinste Netz, das noch funktioniert?
+    Volles Training: Learning Rate: 0.01, Epochs: 1000, Trainingsdaten: 60000, Testdaten: 10000: Accuracy: 98%
     Getestet mit: Learning Rate: 0.1, Epochs: 100, Trainingsdaten: 10000, Testdaten: 100
     784 - 256 - 256 - 10 => Accuracy: 97% Loss: 0,00047
     784 - 128 - 128 - 10 => Accuracy: 97%

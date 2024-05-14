@@ -1,0 +1,11 @@
+- Jeweils ein Datensatz für Rotwein und Weißwein
+- Chemische Eigenschaften der Weine:
+    - Ges. Säuregehalt bzw. Zitronensäuregehalt (g/L)
+    - ph-Wert (Säure < 7 < Base
+    - Zuckergehalt (in g)
+    - Salzgehalt / Chloride (g/L)
+    - Schwefelgehalt / Sulfate (frei und gebunden, g/L))
+    - Dichte des Weins
+    - Alokoholgehalt
+    - Qualitätsbewertung
+
