@@ -19,7 +19,7 @@ def plot_data():
     plt.show()
 
     plt.hist(data['quality'], bins=20, color='skyblue')
-    plt.xlabel('Alkoholgehalt')
+    plt.xlabel('Quality')
     plt.ylabel('Anzahl')
     plt.title('Histogramm des Alkoholgehalts')
     plt.show()
@@ -48,7 +48,7 @@ def plot_data():
     plt.title('Scatterplot: Quality vs. Acidity')
     plt.show()
 
-#plot_data()
+plot_data()
 
 
 scaler = MinMaxScaler()
