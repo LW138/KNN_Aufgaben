@@ -1,8 +1,6 @@
-from matplotlib import pyplot as plt
 from ucimlrepo import fetch_ucirepo
 import pandas as pd
-from sklearn.preprocessing import MinMaxScaler, StandardScaler
-import seaborn as sns
+from sklearn.preprocessing import MinMaxScaler
 
 def encode_data(data):
     # oen-hot encoding for categorical variables
@@ -10,7 +8,7 @@ def encode_data(data):
     return data_encoded
 
 def fill_missing_values(data):
-    # mean for missing values
+    # fill missing values with mean for missing values
     data_filled = data.fillna(data.mean())
     return data_filled
 
@@ -19,6 +17,9 @@ def normalisieren(data):
     scaler = MinMaxScaler()
 
     # use the scaler to transform the data
+    # fit_transform is a combination of fit and transform
+    # fit calculates the mean, variance, min and max (MinMaxScaler) etc.
+    # transform uses these values to transform the data
     data_scaled = scaler.fit_transform(data)
 
     # reform the data into a pandas DataFrame
@@ -27,27 +28,29 @@ def normalisieren(data):
 
 # fetch dataset
 adult = fetch_ucirepo(id=2)
+print(len(adult))
 
 # data (as pandas dataframes)
 X = adult.data.features
 y = adult.data.targets
 
 # metadata
-print(adult.metadata)
+print("Adult Metadata: ", adult.metadata)
 
 # variable information
-print(adult.variables)
+print("Adult Variables: ", adult.variables)
 
 # use functions for data preprocessing
+# makes a one hot encoding on categorical data
 X_encoded = encode_data(X)
 X_filled = fill_missing_values(X_encoded)
 X_scaled = normalisieren(X_filled)
 
-print(X.head())
+print("X Head: ", X.head())
 
-print(X_encoded.head())
+print("X Encdoded: ", X_encoded.head())
 
-print(X_filled.head())
+print("X filled head: ", X_filled.head())
 
-print(X_scaled.head())
+print("X scaled: ", X_scaled.head())
 

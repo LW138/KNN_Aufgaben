@@ -13,8 +13,8 @@ def plot_data():
     # Explorative Datenanalyse
     # Histogramm für Alkoholgehalt
     plt.hist(data['alcohol'], bins=20, color='skyblue')
-    plt.xlabel('Alkoholgehalt')
-    plt.ylabel('in % Vol.') # ToDo: müsste hier nicht auch die Anzahl stehen?
+    plt.xlabel('Alkoholgehalt in %')
+    plt.ylabel('Anzahl') # ToDo: müsste hier nicht auch die Anzahl stehen?
     plt.title('Histogramm des Alkoholgehalts')
     plt.show()
 

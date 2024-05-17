@@ -22,9 +22,9 @@ def predict(test_data, test_labels, weights, biases):
         input = test_data[i]
         _, _, output = forward(input, weights, biases)
         # round the output to be able to compare it with the actual label
-        predicted_label = np.round(output)
-        actual_label = test_labels[i]
-        #print("Predicted: ", predicted_label, "Actual: ", actual_label)
+        predicted_label = np.round(output*10)
+        actual_label = np.round(test_labels[i])
+        print("Predicted: ", predicted_label, "Actual: ", actual_label)
         if predicted_label == actual_label:
             correct_predictions += 1
     accuracy = correct_predictions / len(test_data)
@@ -35,14 +35,15 @@ def forward(input, weights, biases):
     #calculate the activation of each layer by applying the weights and biases to the input
     layer1_act = sigmoid(np.dot(input, weights[0]) + biases[0])
     layer2_act = sigmoid(np.dot(layer1_act, weights[1]) + biases[1])
-    output_act = linear(np.dot(layer2_act, weights[2]) + biases[2])
+    output_act = linear(np.dot(layer2_act, weights[2]) + biases[2]) / 10
     return layer1_act, layer2_act, output_act
 
 
 def backward(weights, layer1, layer2, output, expected_output):
     output_error = expected_output - output
     # delta = error * derivation of activation function => e.g: delta = (output_error) * (sigmoid(x) * (1 - sigmoid(x)))
-    output_delta = output_error * 1  # derivative of linear function is 1
+    #output_delta = output_error * 1  # derivative of linear function is 1
+    output_delta = output_error * 1
 
     # Back propagate the error of layer2 by weighting the error with the weights[2]
     layer2_error = np.dot(output_delta, weights[2].T)
@@ -72,7 +73,7 @@ def train(training_data, training_labels, weights, biases, learning_rate, epochs
     for j in range(epochs):
         for i in range(len(training_data)):
             input = training_data[i]
-            expected_output = training_labels[i]
+            expected_output = training_labels[i] / 10
 
             # Call forward to calculate the output (activation) of each network layer (neuron)
             layer1, layer2, output = forward(input, weights, biases)
@@ -121,12 +122,10 @@ combined_trainings_data_set = combined_data.sample(frac=0.8, random_state=0)
 combined_validation_data_set = combined_data.drop(combined_trainings_data_set.index)
 
 
-
-
 # Define Network
 input_layer = 11
-first_hidden_layer = 10
-second_hidden_layer = 10
+first_hidden_layer = 6
+second_hidden_layer = 6
 output_layer = 1
 
 weights = [np.random.rand(input_layer, first_hidden_layer),
@@ -134,7 +133,7 @@ weights = [np.random.rand(input_layer, first_hidden_layer),
            np.random.rand(second_hidden_layer, output_layer)]
 
 biases = [np.zeros(first_hidden_layer), np.zeros(second_hidden_layer), np.zeros(output_layer)]
-learning_rate = 0.05
+learning_rate = 0.1
 
 
 # train different kinds of networks
@@ -144,8 +143,8 @@ print("Network Shape: ", input_layer, "-", first_hidden_layer, "-", second_hidde
 # trains with white wine data set and predict the quality of white and red wine (exercise 4.3.1 and 4.3.2)
 def network_quality_white():
     print("Length Training Data: ", len(trainings_data_white), "Length Validation Data", len(validation_data_white))
-
-    train(trainings_data_white.drop('quality', axis=1).values, trainings_data_white['quality'].values, weights, biases,learning_rate, 5000)
+    print(trainings_data_white)
+    train(trainings_data_white.drop('quality', axis=1).values, trainings_data_white['quality'].values, weights, biases, learning_rate, 60)
 
     print("Accuracy on Trainings Set", predict(trainings_data_white.drop('quality', axis=1).values, trainings_data_white['quality'].values, weights, biases))
     print("Accuracy on Validation Set", predict(validation_data_white.drop('quality', axis=1).values, validation_data_white['quality'].values, weights, biases))
@@ -170,7 +169,7 @@ def network_quality_red():
 def network_quality_white_and_red():
     print("Length Training Data: ", len(combined_trainings_data_set), "Length Validation Data", len(combined_validation_data_set))
 
-    train(combined_trainings_data_set.drop('quality', axis=1).values, combined_trainings_data_set['quality'].values, weights, biases,learning_rate, 1000)
+    train(combined_trainings_data_set.drop('quality', axis=1).values, combined_trainings_data_set['quality'].values, weights, biases,learning_rate, 20)
 
     print("Accuracy on White Validation Set", predict(validation_data_white.drop('quality', axis=1).values, validation_data_white['quality'].values, weights, biases))
     print("Accuracy on Red Validation Set", predict(validation_data_red.drop('quality', axis=1).values, validation_data_red['quality'].values, weights, biases))
