@@ -33,9 +33,11 @@ X = adult.data.features
 y = adult.data.targets
 
 # metadata
+print("Metadata:")
 print(adult.metadata)
 
 # variable information
+print("Variables:")
 print(adult.variables)
 
 # use functions for data preprocessing
@@ -43,11 +45,12 @@ X_encoded = encode_data(X)
 X_filled = fill_missing_values(X_encoded)
 X_scaled = normalisieren(X_filled)
 
+print("X:")
 print(X.head())
-
+print("X_encoded:")
 print(X_encoded.head())
-
+print("X_filled:")
 print(X_filled.head())
-
+print("X_scaled:")
 print(X_scaled.head())
 
