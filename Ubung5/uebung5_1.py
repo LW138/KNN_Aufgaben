@@ -28,7 +28,6 @@ def normalisieren(data):
 
 # fetch dataset
 adult = fetch_ucirepo(id=2)
-print(len(adult))
 
 # data (as pandas dataframes)
 X = adult.data.features
