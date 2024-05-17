@@ -1,10 +1,6 @@
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
-from torch import tensor
 from torch.utils.data import Dataset, DataLoader, random_split
-
-from Ubung5.uebung5_1 import encode_data, fill_missing_values, normalisieren
-
 
 # a dataset class must implement the __init__, __len__, and __getitem__ methods
 class MyDataset(Dataset):
@@ -14,8 +10,9 @@ class MyDataset(Dataset):
         self.features = self.data.iloc[:, :-1] # all rows, all columns except the last one
         self.labels = self.data.iloc[:, -1] # all rows, only the last column
 
-        # use encode_data function from exercise 5.1
-        self.features = encode_data(self.features)
+        # if the features are categorical, encode them
+        # TODO: One Hot Encoding erzeugt sehr viele False Einträge in der Matrix (ka warum, siehe Debugger)
+        self.features = pd.get_dummies(self.features, drop_first=True)
 
         # ff the target is also categorical, encode it
         if self.labels.dtype == 'object':
@@ -39,21 +36,25 @@ class MyDataset(Dataset):
         return item_data, item_label
 
 
+def main():
+    my_dataset = MyDataset("adult/adult.data", transform=None, target_transform=None)
 
-my_dataset = MyDataset("adult/adult.data", transform=None, target_transform=None)
+    train_len = int(0.8 * len(my_dataset))
+    valid_len = int(0.1 * len(my_dataset))
+    test_len = len(my_dataset) - train_len - valid_len
 
-train_len = int(0.8 * len(my_dataset))
-valid_len = int(0.1 * len(my_dataset))
-test_len = len(my_dataset) - train_len - valid_len
+    train_dataset, valid_dataset, test_dataset = random_split(my_dataset, [train_len, valid_len, test_len])
 
-train_dataset, valid_dataset, test_dataset = random_split(my_dataset, [train_len, valid_len, test_len])
+    train_loader = DataLoader(train_dataset, batch_size=50, shuffle=True)
+    valid_loader = DataLoader(valid_dataset, batch_size=50, shuffle=True)
+    test_loader = DataLoader(test_dataset, batch_size=50, shuffle=True)
 
-train_loader = DataLoader(train_dataset, batch_size=10, shuffle=True)
-valid_loader = DataLoader(valid_dataset, batch_size=10, shuffle=True)
-test_loader = DataLoader(test_dataset, batch_size=10, shuffle=True)
+    train_features, train_labels = next(iter(train_loader))
+    print("Train Features: ", train_features.size())
+    print("Label: ", train_labels.size())
+    label = train_labels[0]
+    print("Label: ", label)
 
-train_features, train_labels = next(iter(train_loader))
-print("Train Features: ", train_features.size())
-print("Label: ", train_labels.size())
-label = train_labels[0]
-print("Label: ", label)
+
+if __name__ == "__main__":
+    main()
