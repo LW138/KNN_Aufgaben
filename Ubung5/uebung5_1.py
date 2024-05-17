@@ -5,23 +5,23 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler
 import seaborn as sns
 
 def encode_data(data):
-    # One-Hot-Encoding für kategorische Spalten
+    # oen-hot encoding for categorical variables
     data_encoded = pd.get_dummies(data, drop_first=True)
     return data_encoded
 
 def fill_missing_values(data):
-    # Fehlende Werte mit dem Durch
+    # mean for missing values
     data_filled = data.fillna(data.mean())
     return data_filled
 
 def normalisieren(data):
-    # Erstellen Sie den Skalierer
-    scaler = MinMaxScaler()  # oder StandardScaler()
+    # create a scaler
+    scaler = MinMaxScaler()
 
-    # Passen Sie den Skalierer an die Daten an und transformieren Sie sie
+    # use the scaler to transform the data
     data_scaled = scaler.fit_transform(data)
 
-    # Umwandeln in DataFrame
+    # reform the data into a pandas DataFrame
     data_scaled = pd.DataFrame(data_scaled, columns=data.columns)
     return data_scaled
 
@@ -38,7 +38,7 @@ print(adult.metadata)
 # variable information
 print(adult.variables)
 
-# Funktionen für die Datenvorbereitung
+# use functions for data preprocessing
 X_encoded = encode_data(X)
 X_filled = fill_missing_values(X_encoded)
 X_scaled = normalisieren(X_filled)
