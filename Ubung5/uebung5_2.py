@@ -14,6 +14,7 @@ class MyDataset(Dataset):
         # TODO: One Hot Encoding erzeugt sehr viele False Einträge in der Matrix (ka warum, siehe Debugger)
         self.features = pd.get_dummies(self.features, drop_first=True)
 
+
         # ff the target is also categorical, encode it
         if self.labels.dtype == 'object':
             self.labels = LabelEncoder().fit_transform(self.labels)
@@ -28,6 +29,7 @@ class MyDataset(Dataset):
     def __getitem__(self, idx):
         item_data = self.features.iloc[idx].values.astype('float32')
         item_label = self.labels[idx]
+        # Vorlesung: Normalize batchwise not datasetwise
         if self.transform:
             item_data = self.transform(item_data)
         if self.target_transform:
@@ -36,7 +38,9 @@ class MyDataset(Dataset):
         return item_data, item_label
 
 
-def main():
+
+
+if __name__ == "__main__":
     my_dataset = MyDataset("adult/adult.data", transform=None, target_transform=None)
 
     train_len = int(0.8 * len(my_dataset))
@@ -54,7 +58,3 @@ def main():
     print("Label: ", train_labels.size())
     label = train_labels[0]
     print("Label: ", label)
-
-
-if __name__ == "__main__":
-    main()
