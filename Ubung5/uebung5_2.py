@@ -14,8 +14,10 @@ class MyDataset(Dataset):
         self.features = self.data.iloc[:, :-1] # all rows, all columns except the last one
         self.labels = self.data.iloc[:, -1] # all rows, only the last column
 
-        # use encode_data function from exercise 5.1
-        self.features = encode_data(self.features)
+        # if the features are categorical, encode them
+        # TODO: One Hot Encoding erzeugt sehr viele False Einträge in der Matrix (ka warum, siehe Debugger)
+        self.features = pd.get_dummies(self.features, drop_first=True)
+
 
         # ff the target is also categorical, encode it
         if self.labels.dtype == 'object':
@@ -31,6 +33,7 @@ class MyDataset(Dataset):
     def __getitem__(self, idx):
         item_data = self.features.iloc[idx].values.astype('float32')
         item_label = self.labels[idx]
+        # Vorlesung: Normalize batchwise not datasetwise
         if self.transform:
             item_data = self.transform(item_data)
         if self.target_transform:
@@ -39,7 +42,9 @@ class MyDataset(Dataset):
         return item_data, item_label
 
 
-if __name__ == '__main__':
+
+
+if __name__ == "__main__":
     my_dataset = MyDataset("adult/adult.data", transform=None, target_transform=None)
 
     train_len = int(0.8 * len(my_dataset))
@@ -48,9 +53,9 @@ if __name__ == '__main__':
 
     train_dataset, valid_dataset, test_dataset = random_split(my_dataset, [train_len, valid_len, test_len])
 
-    train_loader = DataLoader(train_dataset, batch_size=10, shuffle=True)
-    valid_loader = DataLoader(valid_dataset, batch_size=10, shuffle=True)
-    test_loader = DataLoader(test_dataset, batch_size=10, shuffle=True)
+    train_loader = DataLoader(train_dataset, batch_size=50, shuffle=True)
+    valid_loader = DataLoader(valid_dataset, batch_size=50, shuffle=True)
+    test_loader = DataLoader(test_dataset, batch_size=50, shuffle=True)
 
     train_features, train_labels = next(iter(train_loader))
     print("Train Features: ", train_features.size())

@@ -3,7 +3,7 @@ import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 
 def encode_data(data):
-    # oen-hot encoding for categorical variables
+    # one-hot encoding for categorical variables
     data_encoded = pd.get_dummies(data, drop_first=True)
     return data_encoded
 
