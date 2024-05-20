@@ -39,21 +39,21 @@ class MyDataset(Dataset):
         return item_data, item_label
 
 
+if __name__ == '__main__':
+    my_dataset = MyDataset("adult/adult.data", transform=None, target_transform=None)
 
-my_dataset = MyDataset("adult/adult.data", transform=None, target_transform=None)
+    train_len = int(0.8 * len(my_dataset))
+    valid_len = int(0.1 * len(my_dataset))
+    test_len = len(my_dataset) - train_len - valid_len
 
-train_len = int(0.8 * len(my_dataset))
-valid_len = int(0.1 * len(my_dataset))
-test_len = len(my_dataset) - train_len - valid_len
+    train_dataset, valid_dataset, test_dataset = random_split(my_dataset, [train_len, valid_len, test_len])
 
-train_dataset, valid_dataset, test_dataset = random_split(my_dataset, [train_len, valid_len, test_len])
+    train_loader = DataLoader(train_dataset, batch_size=10, shuffle=True)
+    valid_loader = DataLoader(valid_dataset, batch_size=10, shuffle=True)
+    test_loader = DataLoader(test_dataset, batch_size=10, shuffle=True)
 
-train_loader = DataLoader(train_dataset, batch_size=10, shuffle=True)
-valid_loader = DataLoader(valid_dataset, batch_size=10, shuffle=True)
-test_loader = DataLoader(test_dataset, batch_size=10, shuffle=True)
-
-train_features, train_labels = next(iter(train_loader))
-print("Train Features: ", train_features.size())
-print("Label: ", train_labels.size())
-label = train_labels[0]
-print("Label: ", label)
+    train_features, train_labels = next(iter(train_loader))
+    print("Train Features: ", train_features.size())
+    print("Label: ", train_labels.size())
+    label = train_labels[0]
+    print("Label: ", label)
