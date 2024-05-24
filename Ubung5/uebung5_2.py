@@ -53,12 +53,12 @@ if __name__ == "__main__":
 
     train_dataset, valid_dataset, test_dataset = random_split(my_dataset, [train_len, valid_len, test_len])
 
-    train_loader = DataLoader(train_dataset, batch_size=50, shuffle=True)
-    valid_loader = DataLoader(valid_dataset, batch_size=50, shuffle=True)
-    test_loader = DataLoader(test_dataset, batch_size=50, shuffle=True)
+    train_loader = DataLoader(train_dataset, batch_size=1, shuffle=True)
+    valid_loader = DataLoader(valid_dataset, batch_size=1, shuffle=True)
+    test_loader = DataLoader(test_dataset, batch_size=1, shuffle=True)
 
     train_features, train_labels = next(iter(train_loader))
     print("Train Features: ", train_features.size())
-    print("Label: ", train_labels.size())
-    label = train_labels[0]
+    print("Label: ", train_labels)
+    label = train_labels[6]
     print("Label: ", label)

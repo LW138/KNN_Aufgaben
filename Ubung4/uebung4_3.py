@@ -133,7 +133,7 @@ weights = [np.random.rand(input_layer, first_hidden_layer),
            np.random.rand(second_hidden_layer, output_layer)]
 
 biases = [np.zeros(first_hidden_layer), np.zeros(second_hidden_layer), np.zeros(output_layer)]
-learning_rate = 0.1
+learning_rate = 0.01
 
 
 # train different kinds of networks
@@ -143,8 +143,8 @@ print("Network Shape: ", input_layer, "-", first_hidden_layer, "-", second_hidde
 # trains with white wine data set and predict the quality of white and red wine (exercise 4.3.1 and 4.3.2)
 def network_quality_white():
     print("Length Training Data: ", len(trainings_data_white), "Length Validation Data", len(validation_data_white))
-    print(trainings_data_white)
-    train(trainings_data_white.drop('quality', axis=1).values, trainings_data_white['quality'].values, weights, biases, learning_rate, 60)
+
+    train(trainings_data_white.drop('quality', axis=1).values, trainings_data_white['quality'].values, weights, biases, learning_rate, 6000)
 
     print("Accuracy on Trainings Set", predict(trainings_data_white.drop('quality', axis=1).values, trainings_data_white['quality'].values, weights, biases))
     print("Accuracy on Validation Set", predict(validation_data_white.drop('quality', axis=1).values, validation_data_white['quality'].values, weights, biases))
