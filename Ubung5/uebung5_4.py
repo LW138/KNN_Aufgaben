@@ -5,7 +5,7 @@ from torch.utils.data import random_split, DataLoader
 from Ubung5.uebung5_2 import MyDataset
 from Ubung5.uebung5_3 import Net
 
-def train_model(model, train_loader, val_loader, loss_function, optimizer, num_epochs=5):
+def train_model(model, train_loader, val_loader, loss_function, optimizer, num_epochs=100):
     train_losses = []
     val_losses = []
     for epoch in range(num_epochs):
@@ -19,7 +19,7 @@ def train_model(model, train_loader, val_loader, loss_function, optimizer, num_e
             loss = loss_function(outputs, labels)
             loss.backward()
             optimizer.step()
-            running_loss = loss.item()
+            running_loss += loss.item()
 
         train_loss = running_loss / len(train_loader)
         train_losses.append(train_loss)
@@ -29,12 +29,12 @@ def train_model(model, train_loader, val_loader, loss_function, optimizer, num_e
         with torch.no_grad():
             for inputs, labels in val_loader:
                 outputs = model(inputs)
-                outputs = (outputs > 0.5).float()
+                #outputs = (outputs > 0.5).float()
                 labels = labels.view(-1, 1).float()
                 loss = loss_function(outputs, labels)
                 val_loss += loss.item()
 
-        val_loss = val_loss / len(valid_loader)
+        val_loss = val_loss / len(val_loader)
         val_losses.append(val_loss)
 
         print(f"Epoch {epoch+1}/{num_epochs}, Train Loss: {train_loss}, Validation Loss: {val_loss}")
@@ -50,13 +50,13 @@ test_len = len(data) - train_len - valid_len
 
 train_dataset, valid_dataset, test_dataset = random_split(data, [train_len, valid_len, test_len])
 
-train_loader = DataLoader(train_dataset, batch_size=10, shuffle=True)
-valid_loader = DataLoader(valid_dataset, batch_size=10, shuffle=True)
-test_loader = DataLoader(test_dataset, batch_size=10, shuffle=True)
+train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
+valid_loader = DataLoader(valid_dataset, batch_size=32, shuffle=True)
+test_loader = DataLoader(test_dataset, batch_size=32, shuffle=True)
 
 model = Net(100, 10,10,1, weight_init='xavier')
-loss_func = nn.BCEWithLogitsLoss()
-optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
+loss_func = nn.BCELoss()
+optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.5)
 
 train_losses, val_losses = train_model(model, train_loader, valid_loader, loss_func, optimizer)
 
