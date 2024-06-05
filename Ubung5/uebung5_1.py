@@ -26,6 +26,12 @@ def normalisieren(data):
     data_scaled = pd.DataFrame(data_scaled, columns=data.columns)
     return data_scaled
 
+def get_prepared_features(data):
+    data_encoded = encode_data(data)
+    data_filled = fill_missing_values(data_encoded)
+    data_scaled = normalisieren(data_filled)
+    return data_scaled
+
 if __name__ == '__main__':
     # fetch dataset
     adult = fetch_ucirepo(id=2)

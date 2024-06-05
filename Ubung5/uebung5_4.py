@@ -6,32 +6,47 @@ from Ubung5.uebung5_2 import MyDataset
 from Ubung5.uebung5_3 import Net
 
 def train_model(model, train_loader, val_loader, loss_function, optimizer, num_epochs=100):
+    # lists to store the losses to plot them afterwards
     train_losses = []
     val_losses = []
-    for epoch in range(num_epochs):
-        model.train()
-        running_loss = 0.0
-        for inputs, labels in train_loader:
-            optimizer.zero_grad()
-            outputs = model(inputs)
 
-            labels = labels.view(-1,1).float()
-            loss = loss_function(outputs, labels)
+    for epoch in range(num_epochs):
+        # set the model to training mode
+        model.train()
+
+        # initialize the running loss for the current epoch to 0
+        running_loss = 0.0
+
+        # iterate over the training data
+        for train_input, train_label in train_loader:
+            # zero the gradients
+            optimizer.zero_grad()
+
+            # forward pass
+            output = model(train_input)
+
+            # calculate the loss
+            train_label = train_label.view(-1,1).float()
+            loss = loss_function(output, train_label)
+
+            # backward pass
             loss.backward()
+
+            # update the weights
             optimizer.step()
             running_loss += loss.item()
 
         train_loss = running_loss / len(train_loader)
         train_losses.append(train_loss)
 
+        # set the model to evaluation mode
         model.eval()
         val_loss = 0.0
         with torch.no_grad():
-            for inputs, labels in val_loader:
-                outputs = model(inputs)
-                #outputs = (outputs > 0.5).float()
-                labels = labels.view(-1, 1).float()
-                loss = loss_function(outputs, labels)
+            for val_input, val_label in val_loader:
+                outputs = model(val_input)
+                val_label = val_label.view(-1, 1).float()
+                loss = loss_function(outputs, val_label)
                 val_loss += loss.item()
 
         val_loss = val_loss / len(val_loader)
@@ -39,7 +54,7 @@ def train_model(model, train_loader, val_loader, loss_function, optimizer, num_e
 
         print(f"Epoch {epoch+1}/{num_epochs}, Train Loss: {train_loss}, Validation Loss: {val_loss}")
 
-    return  train_losses, val_losses
+    return train_losses, val_losses
 
 
 data = MyDataset("adult/adult.data", transform=None, target_transform=None)
@@ -55,8 +70,8 @@ valid_loader = DataLoader(valid_dataset, batch_size=32, shuffle=True)
 test_loader = DataLoader(test_dataset, batch_size=32, shuffle=True)
 
 model = Net(100, 10,10,1, weight_init='xavier')
-loss_func = nn.BCELoss()
-optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.5)
+loss_func = nn.MSELoss()
+optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.3)
 
 train_losses, val_losses = train_model(model, train_loader, valid_loader, loss_func, optimizer)
 

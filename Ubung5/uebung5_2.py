@@ -2,7 +2,7 @@ import pandas as pd
 from sklearn.preprocessing import LabelEncoder, StandardScaler, MinMaxScaler
 from torch.utils.data import Dataset, DataLoader, random_split
 
-from Ubung5.uebung5_1 import encode_data, fill_missing_values, normalisieren
+from Ubung5.uebung5_1 import encode_data, fill_missing_values, normalisieren, get_prepared_features
 
 
 # a dataset class must implement the __init__, __len__, and __getitem__ methods
@@ -10,15 +10,15 @@ class MyDataset(Dataset):
     def __init__(self, data_file_path, transform=None, target_transform=None):
         # read data from csv file to pands dataframe
         self.data = pd.read_csv(data_file_path, sep=",", header=None)
+
+        # set the column names to string
         self.data.columns = self.data.columns.astype(str)
         #  get all columns except the last one as features and the last column as labels
         self.features = self.data.iloc[:, :-1]
         self.labels = self.data.iloc[:, -1]
 
-        # get_dummies is used for a one-hot encoding of categorical variables
-        self.features = pd.get_dummies(self.features, drop_first=True)
-        self.features = self.features.fillna(self.features.mean())
-        self.features = pd.DataFrame(MinMaxScaler().fit_transform(self.features), columns=self.features.columns)
+        # prepare the features
+        self.features = get_prepared_features(self.features)
 
         # if the target is also categorical, encode it
         if self.labels.dtype == 'object':
