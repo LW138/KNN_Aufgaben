@@ -5,7 +5,7 @@ from Ubung5.uebung5_2 import MyDataset
 from Ubung5.uebung5_3 import Net
 from torch.utils.tensorboard import SummaryWriter
 
-def train_model(model, train_loader, val_loader, loss_function, optimizer, writer, num_epochs=50, device='cpu'):
+def train_model(model, train_loader, val_loader, loss_function, optimizer, writer, num_epochs=20, device='cpu'):
     # Move model to the specified device
     model.to(device)
 
@@ -43,7 +43,7 @@ def train_model(model, train_loader, val_loader, loss_function, optimizer, write
             running_loss += loss.item()
 
         train_loss = running_loss / len(train_loader)
-        train_losses.append(train_loss)
+        #train_losses.append(train_loss)
 
         # Set the model to evaluation mode
         model.eval()
@@ -59,7 +59,7 @@ def train_model(model, train_loader, val_loader, loss_function, optimizer, write
                 val_loss += loss.item()
 
         val_loss = val_loss / len(val_loader)
-        val_losses.append(val_loss)
+        #val_losses.append(val_loss)
 
         print(f"Epoch {epoch + 1}/{num_epochs}, Train Loss: {train_loss}, Validation Loss: {val_loss}")
 
