@@ -36,7 +36,6 @@ class Net(nn.Module):
 
 
 if __name__ == "__main__":
-
     # create an instance of the Net class
     model = Net(14, 10, 10, 1, weight_init='xavier')
 

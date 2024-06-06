@@ -93,13 +93,13 @@ test_len = len(data) - train_len - valid_len
 
 train_dataset, valid_dataset, test_dataset = random_split(data, [train_len, valid_len, test_len])
 
-train_loader = DataLoader(train_dataset, batch_size=256, shuffle=True)
-valid_loader = DataLoader(valid_dataset, batch_size=256, shuffle=True)
-test_loader = DataLoader(test_dataset, batch_size=256, shuffle=True)
+train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
+valid_loader = DataLoader(valid_dataset, batch_size=32, shuffle=True)
+test_loader = DataLoader(test_dataset, batch_size=32, shuffle=True)
 
-model = Net(100, 10, 10, 1, weight_init='xavier')
+model = Net(100, 10, 10, 1, weight_init='kaiming')
 loss_func = nn.MSELoss()
-optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.3)
+optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.1)
 
 train_losses, val_losses = train_model(model, train_loader, valid_loader, loss_func, optimizer, device=device)
 

@@ -11,8 +11,9 @@ class MyDataset(Dataset):
         # read data from csv file to pands dataframe
         self.data = pd.read_csv(data_file_path, sep=",", header=None)
 
-        # set the column names to string
+        # set the column to string
         self.data.columns = self.data.columns.astype(str)
+
         #  get all columns except the last one as features and the last column as labels
         self.features = self.data.iloc[:, :-1]
         self.labels = self.data.iloc[:, -1]
