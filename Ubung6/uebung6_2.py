@@ -42,8 +42,8 @@ class FashionMNISTNet(nn.Module):
 
     def train_model(self, train_loader, valid_loader, optimizer, loss_function, logger, num_epochs,  device='cpu'):
         # Set the model to training mode
-        self.train()
         self.to(device)
+        self.train()
         # Loop over the epochs
         for epoch in range(num_epochs):
             running_loss = 0.0
@@ -101,6 +101,10 @@ if __name__ == "__main__":
     # Define a transform to convert the images to tensors
     transform = transforms.Compose([transforms.ToTensor()])
 
+    # Check if CUDA is available and set the device accordingly
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    print(f"Using device: {device}")
+
     dataset = datasets.FashionMNIST('~/.pytorch/F_MNIST_data/', download=True, train=True, transform=transform)
 
     train_len = int(0.8 * len(dataset))
@@ -108,9 +112,11 @@ if __name__ == "__main__":
     test_len = len(dataset) - train_len - valid_len
     train_dataset, valid_dataset, test_dataset = random_split(dataset, [train_len, valid_len, test_len])
 
-    train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
-    valid_loader = DataLoader(valid_dataset, batch_size=32, shuffle=True)
-    test_loader = DataLoader(test_dataset, batch_size=32, shuffle=True)
+    batch_size = 32768
+
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+    valid_loader = DataLoader(valid_dataset, batch_size=batch_size, shuffle=True)
+    test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=True)
 
     loss_func = nn.CrossEntropyLoss()
 
@@ -119,5 +125,5 @@ if __name__ == "__main__":
     optimizer = optim.Adam(model.parameters(), lr=0.01)
     logger = SummaryWriter()
 
-    model.train_model(train_loader, valid_loader, optimizer, loss_func, logger, 20, device='cpu')
-    model.check_test_accuracy(test_loader, device='cpu')
+    model.train_model(train_loader, valid_loader, optimizer, loss_func, logger, 20, device=device)
+    model.check_test_accuracy(test_loader, device=device)
