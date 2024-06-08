@@ -16,7 +16,9 @@ class FashionMNISTNet(nn.Module):
         self.layer1 = nn.Linear(input_size, hidden_size1)
         self.layer2 = nn.Linear(hidden_size1, hidden_size2)
         self.layer3 = nn.Linear(hidden_size2, num_classes)
+        ##### Flat Spot Optimierer Dropout ######
         self.dropout = nn.Dropout(0.5)
+        ##### Flat Spot Optimierer Batch Normalization ######
         self.bn1 = nn.BatchNorm1d(hidden_size1)
         self.bn2 = nn.BatchNorm1d(hidden_size2)
 
@@ -95,6 +97,7 @@ class FashionMNISTNet(nn.Module):
             print(f"Epoch {epoch + 1}/{num_epochs}, Train Loss: {train_loss}, Validation Loss: {val_loss}")
             scheduler.step()
 
+            ##### Flat Spot Optimierer Early Stopping ######
             if early_stopping:
                 if val_loss < best_val_loss:
                     best_val_loss = val_loss
@@ -145,6 +148,8 @@ class FashionMNISTNet(nn.Module):
 if __name__ == "__main__":
     logger = SummaryWriter()
     # Define a transform to convert the images to tensors and add data augmentation
+
+    ####### Flat Spot Optimierer Augmentation ######
     transform = transforms.Compose([
         transforms.RandomHorizontalFlip(),
         transforms.RandomRotation(10),
@@ -170,11 +175,11 @@ if __name__ == "__main__":
     loss_func = nn.CrossEntropyLoss()
 
     # Define the several optimizers
+    ##### Flat Spot Optimierer Weight Decay ######
     SGD = optim.SGD(model.parameters(), lr=0.01, momentum=0.8, weight_decay=0.0005)
     Adam = optim.Adam(model.parameters(), lr=0.01, weight_decay=0.0005)
     RMSprop = optim.RMSprop(model.parameters(), lr=0.01, weight_decay=0.0005)
-
-    optimizer = Adam
+    optimizer = SGD
 
     # Define the warum up
     warmup_steps = 10
