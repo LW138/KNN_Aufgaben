@@ -19,8 +19,8 @@ class FashionMNISTNet(nn.Module):
         ##### Flat Spot Optimierer Dropout ######
         self.dropout = nn.Dropout(0.5)
         ##### Flat Spot Optimierer Batch Normalization ######
-        self.bn1 = nn.BatchNorm1d(hidden_size1)
-        self.bn2 = nn.BatchNorm1d(hidden_size2)
+      #  self.bn1 = nn.BatchNorm1d(hidden_size1)
+      #  self.bn2 = nn.BatchNorm1d(hidden_size2)
 
         #  based on the weight_init parameter, the weights of the linear layers are initialized
         if weight_init == 'xavier':
@@ -151,8 +151,8 @@ if __name__ == "__main__":
 
     ####### Flat Spot Optimierer Augmentation ######
     transform = transforms.Compose([
-        transforms.RandomHorizontalFlip(),
-        transforms.RandomRotation(10),
+      #  transforms.RandomHorizontalFlip(),
+       # transforms.RandomRotation(10),
         transforms.ToTensor(),
     ])
 
@@ -181,7 +181,7 @@ if __name__ == "__main__":
     RMSprop = optim.RMSprop(model.parameters(), lr=0.01, weight_decay=0.0005)
     optimizer = SGD
 
-    # Define the warum up
+    ##### Flat Spot Optimierer warmup ######
     warmup_steps = 10
     lr_lambda = lambda epoch: epoch / warmup_steps if epoch < warmup_steps else 1
     scheduler = optim.lr_scheduler.LambdaLR(optimizer, lr_lambda)
