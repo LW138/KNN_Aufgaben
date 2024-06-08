@@ -58,8 +58,6 @@ class FashionMNISTNet(nn.Module):
                 outputs = self(inputs)
                 # Calculate the loss
                 loss = loss_function(outputs, labels)
-                # Log the loss
-                logger.add_scalar('Loss/train', loss, epoch)
                 # Backward pass
                 loss.backward()
                 # Update the weights
@@ -67,6 +65,7 @@ class FashionMNISTNet(nn.Module):
                 # Add the loss to the running_loss
                 running_loss += loss.item()
             train_loss = running_loss / len(train_loader)
+            logger.add_scalar('Loss/train', train_loss, epoch + 1)
 
             # Set the model to evaluation mode
             model.eval()
@@ -74,13 +73,12 @@ class FashionMNISTNet(nn.Module):
             with torch.no_grad():
                 for val_input, val_label in valid_loader:
                     val_input, val_label = val_input.to(device), val_label.to(device)
-                    logger.add_scalar('Loss/validate', loss, epoch)
                     outputs = model(val_input)
                     loss = loss_function(outputs, val_label)
                     val_loss += loss.item()
 
-            val_loss = val_loss / len(valid_loader)
-
+            logger.add_scalar('Loss/validate', val_loss, epoch + 1)
+            logger.flush()
             print(f"Epoch {epoch + 1}/{num_epochs}, Train Loss: {train_loss}, Validation Loss: {val_loss}")
 
     def check_test_accuracy(self, test_loader, device='cpu'):
@@ -112,7 +110,7 @@ if __name__ == "__main__":
     test_len = len(dataset) - train_len - valid_len
     train_dataset, valid_dataset, test_dataset = random_split(dataset, [train_len, valid_len, test_len])
 
-    batch_size = 32768
+    batch_size = 32
 
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     valid_loader = DataLoader(valid_dataset, batch_size=batch_size, shuffle=True)
@@ -127,3 +125,5 @@ if __name__ == "__main__":
 
     model.train_model(train_loader, valid_loader, optimizer, loss_func, logger, 20, device=device)
     model.check_test_accuracy(test_loader, device=device)
+
+    logger.close()
