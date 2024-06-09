@@ -157,8 +157,8 @@ if __name__ == "__main__":
     ])
 
     # Check if CUDA is available and set the device accordingly
-    #device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    device = 'cpu'
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    # device = 'cpu'
     print(f"Using device: {device}")
 
     dataset = datasets.FashionMNIST('~/.pytorch/F_MNIST_data/', download=True, train=True, transform=transform)
