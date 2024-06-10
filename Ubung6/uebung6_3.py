@@ -17,10 +17,10 @@ class FashionMNISTNet(nn.Module):
         self.layer2 = nn.Linear(hidden_size1, hidden_size2)
         self.layer3 = nn.Linear(hidden_size2, num_classes)
         ##### Flat Spot Optimierer Dropout ######
-        self.dropout = nn.Dropout(0.5)
+      #  self.dropout = nn.Dropout(0.5)
         ##### Flat Spot Optimierer Batch Normalization ######
-      #  self.bn1 = nn.BatchNorm1d(hidden_size1)
-      #  self.bn2 = nn.BatchNorm1d(hidden_size2)
+        #self.bn1 = nn.BatchNorm1d(hidden_size1)
+        #self.bn2 = nn.BatchNorm1d(hidden_size2)
 
         #  based on the weight_init parameter, the weights of the linear layers are initialized
         if weight_init == 'xavier':
@@ -41,9 +41,9 @@ class FashionMNISTNet(nn.Module):
         # Flatten the input tensor
         x = x.view(x.size(0), -1)
         out = F.relu(self.layer1(x))
-        out = self.dropout(out)
+        #out = self.dropout(out)
         out = F.relu(self.layer2(out))
-        out = self.dropout(out)
+       # out = self.dropout(out)
         out = F.softmax(self.layer3(out), dim=1)
         return out
 
@@ -95,7 +95,7 @@ class FashionMNISTNet(nn.Module):
             logger.add_scalar('Loss/validate', val_loss, epoch+1)
             logger.flush()
             print(f"Epoch {epoch + 1}/{num_epochs}, Train Loss: {train_loss}, Validation Loss: {val_loss}")
-            scheduler.step()
+            #scheduler.step()
 
             ##### Flat Spot Optimierer Early Stopping ######
             if early_stopping:
@@ -151,8 +151,8 @@ if __name__ == "__main__":
 
     ####### Flat Spot Optimierer Augmentation ######
     transform = transforms.Compose([
-      #  transforms.RandomHorizontalFlip(),
-       # transforms.RandomRotation(10),
+        #transforms.RandomHorizontalFlip(),
+        #transforms.RandomRotation(10),
         transforms.ToTensor(),
     ])
 
@@ -178,8 +178,8 @@ if __name__ == "__main__":
     ##### Flat Spot Optimierer Weight Decay ######
     SGD = optim.SGD(model.parameters(), lr=0.01, momentum=0.8, weight_decay=0.0005)
     Adam = optim.Adam(model.parameters(), lr=0.01, weight_decay=0.0005)
-    RMSprop = optim.RMSprop(model.parameters(), lr=0.01, weight_decay=0.0005)
-    optimizer = SGD
+    RMSprop = optim.RMSprop(model.parameters(), lr=0.01)#, weight_decay=0.0005)
+    optimizer = RMSprop
 
     ##### Flat Spot Optimierer warmup ######
     warmup_steps = 10
