@@ -9,6 +9,7 @@ from torch.utils.tensorboard import SummaryWriter
 from torch.utils.data import DataLoader, random_split
 from torchmetrics import Accuracy
 
+
 class FashionMNISTNet(nn.Module):
     def __init__(self, input_size, hidden_size1, hidden_size2, num_classes, weight_init='xavier'):
         super(FashionMNISTNet, self).__init__()
@@ -44,9 +45,14 @@ class FashionMNISTNet(nn.Module):
         # Set the model to training mode
         self.to(device)
         self.train()
+        train_accuracy = Accuracy(task='multiclass', num_classes=10, average='micro').to(device)
+        valid_accuracy = Accuracy(task='multiclass', num_classes=10, average='micro').to(device)
+
         # Loop over the epochs
         for epoch in range(num_epochs):
             train_loss = 0.0
+            train_accuracy.reset()
+
             for i, data in enumerate(train_loader, 0):
                 # Get the inputs and labels
                 inputs, labels = data
@@ -64,33 +70,50 @@ class FashionMNISTNet(nn.Module):
                 optimizer.step()
                 # Add the loss to the running_loss
                 train_loss += loss.item()
+                # Update accuracy
+                train_accuracy.update(outputs, labels)
+
             train_loss = train_loss / len(train_loader)
+            train_acc = train_accuracy.compute()
             logger.add_scalar('Loss/train', train_loss, epoch + 1)
+            logger.add_scalar('Accuracy/train', train_acc, epoch + 1)
 
             # Set the model to evaluation mode
-            model.eval()
+            self.eval()
             val_loss = 0.0
+            valid_accuracy.reset()
+
             with torch.no_grad():
                 for val_input, val_label in valid_loader:
                     val_input, val_label = val_input.to(device), val_label.to(device)
-                    outputs = model(val_input)
+                    outputs = self(val_input)
                     loss = loss_function(outputs, val_label)
                     val_loss += loss.item()
+                    # Update accuracy
+                    valid_accuracy.update(outputs, val_label)
+
             val_loss = val_loss / len(valid_loader)
+            val_acc = valid_accuracy.compute()
             logger.add_scalar('Loss/validate', val_loss, epoch + 1)
+            logger.add_scalar('Accuracy/validate', val_acc, epoch + 1)
             logger.flush()
-            print(f"Epoch {epoch + 1}/{num_epochs}, Train Loss: {train_loss}, Validation Loss: {val_loss}")
+
+            print(f"Epoch {epoch + 1}/{num_epochs}, Train Loss: {train_loss}, Train Accuracy: {train_acc}, Validation Loss: {val_loss}, Validation Accuracy: {val_acc}")
 
     def check_test_accuracy(self, test_loader, device='cpu'):
         self.eval()
+        test_accuracy = Accuracy(task='multiclass', num_classes=10, average='micro').to(device)
+
         with torch.no_grad():
             for test_input, test_label in test_loader:
                 test_input, test_label = test_input.to(device), test_label.to(device)
                 outputs = self(test_input)
                 _, predicted = torch.max(outputs.data, 1)
-                accuracy.update(predicted, test_label)
-            acc = accuracy.compute()
-        print(f"Accuracy on the test set: {acc*100}%")
+                test_accuracy.update(predicted, test_label)
+
+        acc = test_accuracy.compute()
+        print(f"Accuracy on the test set: {acc * 100}%")
+
 
 if __name__ == "__main__":
     # Define a transform to convert the images to tensors
@@ -115,9 +138,9 @@ if __name__ == "__main__":
 
     loss_func = nn.CrossEntropyLoss()
 
-    model = FashionMNISTNet(784, 16, 16, 10,  weight_init='xavier')
+    model = FashionMNISTNet(784, 16, 16, 10, weight_init='xavier')
 
-    optimizer = optim.Adam(model.parameters(), lr=0.01)
+    optimizer = optim.Adam(model.parameters(), lr=0.001)
     logger = SummaryWriter()
 
     model.train_model(train_loader, valid_loader, optimizer, loss_func, logger, 25, device=device)
