@@ -110,7 +110,7 @@ if __name__ == "__main__":
     test_len = len(dataset) - train_len - valid_len
     train_dataset, valid_dataset, test_dataset = random_split(dataset, [train_len, valid_len, test_len])
 
-    batch_size = 32
+    batch_size = 16384
 
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     valid_loader = DataLoader(valid_dataset, batch_size=batch_size, shuffle=True)
@@ -123,7 +123,19 @@ if __name__ == "__main__":
     optimizer = optim.Adam(model.parameters(), lr=0.01)
     logger = SummaryWriter()
 
-    model.train_model(train_loader, valid_loader, optimizer, loss_func, logger, 20, device=device)
+    model.train_model(train_loader, valid_loader, optimizer, loss_func, logger, 50, device=device)
     model.check_test_accuracy(test_loader, device=device)
 
     logger.close()
+
+    """
+    normal (model = FashionMNISTNet(784, 16, 16, 10,  weight_init='xavier')): 
+        Epoch 50/50, Train Loss: 1.7269659439722698, Validation Loss: 1.7293099164962769
+        Accuracy on the test set: 72.86666666666666%
+    overfitting (model = FashionMNISTNet(784, 750, 750, 10,  weight_init='xavier')):
+        Epoch 50/50, Train Loss: 2.361170689264933, Validation Loss: 2.3603177070617676
+        Accuracy on the test set: 9.95%
+    underfitting (model = FashionMNISTNet(784, 1, 1, 10,  weight_init='xavier')):
+        Epoch 50/50, Train Loss: 2.1603426933288574, Validation Loss: 2.1632094383239746
+        Accuracy on the test set: 27.633333333333333%
+    """
