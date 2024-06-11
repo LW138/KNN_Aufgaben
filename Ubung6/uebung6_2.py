@@ -115,9 +115,9 @@ if __name__ == "__main__":
 
     loss_func = nn.CrossEntropyLoss()
 
-    model = FashionMNISTNet(784, 750, 750, 10,  weight_init='xavier')
+    model = FashionMNISTNet(784, 16, 16, 10,  weight_init='xavier')
 
-    optimizer = optim.Adam(model.parameters(), lr=0.1)
+    optimizer = optim.Adam(model.parameters(), lr=0.01)
     logger = SummaryWriter()
 
     model.train_model(train_loader, valid_loader, optimizer, loss_func, logger, 25, device=device)

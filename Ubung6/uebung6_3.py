@@ -96,7 +96,7 @@ class FashionMNISTNet(nn.Module):
             logger.add_scalar('Loss/validate', val_loss, epoch+1)
             logger.flush()
             print(f"Epoch {epoch + 1}/{num_epochs}, Train Loss: {train_loss}, Validation Loss: {val_loss}")
-            #scheduler.step()
+            scheduler.step()
 
             ##### Flat Spot Optimierer Early Stopping ######
             if early_stopping:
@@ -110,27 +110,6 @@ class FashionMNISTNet(nn.Module):
                     print("Early stopping")
                     break
 
-    def get_initial_loss(self, train_loader, valid_loader, loss_function, device='cpu'):
-        running_loss = 0.0
-        for i, data in enumerate(train_loader, 0):
-            inputs, labels = data
-            inputs, labels = inputs.to(device), labels.to(device)
-            outputs = self(inputs)
-            loss = loss_function(outputs, labels)
-            running_loss += loss.item()
-        train_loss = running_loss / len(train_loader)
-        logger.add_scalar('Loss/train', train_loss, 0)
-
-        val_loss = 0.0
-        for val_input, val_label in valid_loader:
-            val_input, val_label = val_input.to(device), val_label.to(device)
-            outputs = model(val_input)
-            loss = loss_function(outputs, val_label)
-            val_loss += loss.item()
-        val_loss = val_loss / len(valid_loader)
-        logger.add_scalar('Loss/validate', val_loss, 0)
-        logger.flush()
-        print(f"Initial Loss, Train Loss: {train_loss}, Validation Loss: {val_loss}")
 
     def check_test_accuracy(self, test_loader, device='cpu'):
         self.eval()
@@ -143,8 +122,8 @@ class FashionMNISTNet(nn.Module):
                 _, predicted = torch.max(outputs.data, 1)
                 total += test_label.size(0)
                 correct += (predicted == test_label).sum().item()
-
         print(f"Accuracy on the test set: {100 * correct / total}%")
+
 
 if __name__ == "__main__":
     logger = SummaryWriter()
@@ -179,7 +158,7 @@ if __name__ == "__main__":
     ##### Flat Spot Optimierer Weight Decay ######
     SGD = optim.SGD(model.parameters(), lr=0.01, momentum=0.8)#, weight_decay=0.0005)
     Adam = optim.Adam(model.parameters(), lr=0.01, weight_decay=0.0005)
-    RMSprop = optim.RMSprop(model.parameters(), lr=0.01, weight_decay=0.0005)
+    RMSprop = optim.RMSprop(model.parameters(), lr=0.01, momentum=0.9, weight_decay=0.0005)
     optimizer = SGD
 
     ##### Flat Spot Optimierer warmup ######
@@ -187,8 +166,6 @@ if __name__ == "__main__":
     lr_lambda = lambda epoch: epoch / warmup_steps if epoch < warmup_steps else 1
     scheduler = optim.lr_scheduler.LambdaLR(optimizer, lr_lambda)
 
-    # Train the model. 1. get initial loss 2. train the model 3. check the test accuracy
-    model.get_initial_loss(train_loader, valid_loader, loss_func, device=device)
     model.train_model(train_loader, valid_loader, optimizer, loss_func, scheduler, logger,  num_epochs=25, early_stopping=True, device=device)
     model.check_test_accuracy(test_loader, device=device)
 
