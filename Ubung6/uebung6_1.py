@@ -49,7 +49,8 @@ def train_model(model, train_loader, val_loader, loss_function, optimizer, write
                 val_loss += loss.item()
 
         val_loss = val_loss / len(val_loader)
-
+        writer.add_scalar('Loss/Validate', val_loss, epoch)
+        writer.flush()
         print(f"Epoch {epoch + 1}/{num_epochs}, Train Loss: {train_loss}, Validation Loss: {val_loss}")
 
 

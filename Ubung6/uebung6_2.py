@@ -7,6 +7,7 @@ from torchvision import transforms
 from torch import optim
 from torch.utils.tensorboard import SummaryWriter
 from torch.utils.data import DataLoader, random_split
+import torchmetrics
 
 
 class FashionMNISTNet(nn.Module):
@@ -31,14 +32,14 @@ class FashionMNISTNet(nn.Module):
         init.zeros_(self.layer2.bias)
         init.zeros_(self.layer3.bias)
 
-    def forward(self, x):
+    def forward(self, input):
         # F is an alias for torch.nn.functional, which contains functions for many common operations on tensors
         # Flatten the input tensor
-        x = x.view(x.size(0), -1)
-        out = F.relu(self.layer1(x))
-        out = F.relu(self.layer2(out))
-        out = F.softmax(self.layer3(out), dim=1)
-        return out
+        input_flatten = input.view(input.size(0), -1)
+        out_layer1 = F.relu(self.layer1(input_flatten))
+        out_layer2 = F.relu(self.layer2(out_layer1))
+        out_layer3 = F.softmax(self.layer3(out_layer2), dim=1)
+        return out_layer3
 
     def train_model(self, train_loader, valid_loader, optimizer, loss_function, logger, num_epochs,  device='cpu'):
         # Set the model to training mode
@@ -46,7 +47,7 @@ class FashionMNISTNet(nn.Module):
         self.train()
         # Loop over the epochs
         for epoch in range(num_epochs):
-            running_loss = 0.0
+            train_loss = 0.0
             for i, data in enumerate(train_loader, 0):
                 # Get the inputs and labels
                 inputs, labels = data
@@ -63,8 +64,8 @@ class FashionMNISTNet(nn.Module):
                 # Update the weights
                 optimizer.step()
                 # Add the loss to the running_loss
-                running_loss += loss.item()
-            train_loss = running_loss / len(train_loader)
+                train_loss += loss.item()
+            train_loss = train_loss / len(train_loader)
             logger.add_scalar('Loss/train', train_loss, epoch + 1)
 
             # Set the model to evaluation mode
@@ -76,7 +77,7 @@ class FashionMNISTNet(nn.Module):
                     outputs = model(val_input)
                     loss = loss_function(outputs, val_label)
                     val_loss += loss.item()
-
+            val_loss = val_loss / len(valid_loader)
             logger.add_scalar('Loss/validate', val_loss, epoch + 1)
             logger.flush()
             print(f"Epoch {epoch + 1}/{num_epochs}, Train Loss: {train_loss}, Validation Loss: {val_loss}")
@@ -90,10 +91,10 @@ class FashionMNISTNet(nn.Module):
                 test_input, test_label = test_input.to(device), test_label.to(device)
                 outputs = self(test_input)
                 _, predicted = torch.max(outputs.data, 1)
-                total += test_label.size(0)
-                correct += (predicted == test_label).sum().item()
+                accuracy.update(predicted, test_label)
+            acc = accuracy.compute()
 
-        print(f"Accuracy on the test set: {100 * correct / total}%")
+        print(f"Accuracy on the test set: {acc*100}%")
 
 if __name__ == "__main__":
     # Define a transform to convert the images to tensors
@@ -123,7 +124,9 @@ if __name__ == "__main__":
     optimizer = optim.Adam(model.parameters(), lr=0.01)
     logger = SummaryWriter()
 
-    model.train_model(train_loader, valid_loader, optimizer, loss_func, logger, 20, device=device)
+    model.train_model(train_loader, valid_loader, optimizer, loss_func, logger, 25, device=device)
+
+    accuracy = torchmetrics.Accuracy()
     model.check_test_accuracy(test_loader, device=device)
 
     logger.close()
