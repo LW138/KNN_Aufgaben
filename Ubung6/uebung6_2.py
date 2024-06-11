@@ -7,7 +7,7 @@ from torchvision import transforms
 from torch import optim
 from torch.utils.tensorboard import SummaryWriter
 from torch.utils.data import DataLoader, random_split
-
+from torchmetrics import Accuracy
 
 class FashionMNISTNet(nn.Module):
     def __init__(self, input_size, hidden_size1, hidden_size2, num_classes, weight_init='xavier'):
@@ -83,8 +83,6 @@ class FashionMNISTNet(nn.Module):
 
     def check_test_accuracy(self, test_loader, device='cpu'):
         self.eval()
-        correct = 0
-        total = 0
         with torch.no_grad():
             for test_input, test_label in test_loader:
                 test_input, test_label = test_input.to(device), test_label.to(device)
@@ -92,7 +90,6 @@ class FashionMNISTNet(nn.Module):
                 _, predicted = torch.max(outputs.data, 1)
                 accuracy.update(predicted, test_label)
             acc = accuracy.compute()
-
         print(f"Accuracy on the test set: {acc*100}%")
 
 if __name__ == "__main__":
@@ -118,14 +115,14 @@ if __name__ == "__main__":
 
     loss_func = nn.CrossEntropyLoss()
 
-    model = FashionMNISTNet(784, 16, 16, 10,  weight_init='xavier')
+    model = FashionMNISTNet(784, 750, 750, 10,  weight_init='xavier')
 
-    optimizer = optim.Adam(model.parameters(), lr=0.01)
+    optimizer = optim.Adam(model.parameters(), lr=0.1)
     logger = SummaryWriter()
 
     model.train_model(train_loader, valid_loader, optimizer, loss_func, logger, 25, device=device)
 
-    accuracy = torchmetrics.Accuracy()
+    accuracy = Accuracy(task='multiclass', num_classes=10, average='micro')
     model.check_test_accuracy(test_loader, device=device)
 
     logger.close()

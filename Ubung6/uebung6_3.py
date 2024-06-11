@@ -18,6 +18,7 @@ class FashionMNISTNet(nn.Module):
         self.layer3 = nn.Linear(hidden_size2, num_classes)
         ##### Flat Spot Optimierer Dropout ######
       #  self.dropout = nn.Dropout(0.5)
+
         ##### Flat Spot Optimierer Batch Normalization ######
         #self.bn1 = nn.BatchNorm1d(hidden_size1)
         #self.bn2 = nn.BatchNorm1d(hidden_size2)
@@ -43,7 +44,7 @@ class FashionMNISTNet(nn.Module):
         out = F.relu(self.layer1(x))
         #out = self.dropout(out)
         out = F.relu(self.layer2(out))
-       # out = self.dropout(out)
+        #out = self.dropout(out)
         out = F.softmax(self.layer3(out), dim=1)
         return out
 
@@ -176,10 +177,10 @@ if __name__ == "__main__":
 
     # Define the several optimizers
     ##### Flat Spot Optimierer Weight Decay ######
-    SGD = optim.SGD(model.parameters(), lr=0.01, momentum=0.8, weight_decay=0.0005)
+    SGD = optim.SGD(model.parameters(), lr=0.01, momentum=0.8)#, weight_decay=0.0005)
     Adam = optim.Adam(model.parameters(), lr=0.01, weight_decay=0.0005)
-    RMSprop = optim.RMSprop(model.parameters(), lr=0.01)#, weight_decay=0.0005)
-    optimizer = RMSprop
+    RMSprop = optim.RMSprop(model.parameters(), lr=0.01, weight_decay=0.0005)
+    optimizer = SGD
 
     ##### Flat Spot Optimierer warmup ######
     warmup_steps = 10
