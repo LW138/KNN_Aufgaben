@@ -49,7 +49,7 @@ class FashionMNISTNet(nn.Module):
         return out
 
     def train_model(self, train_loader, valid_loader, optimizer, loss_function, scheduler, logger, num_epochs=20, early_stopping=False, device='cpu'):
-        # redirct input to GPU if available and set the model to training mode
+        # redirect input to GPU if available and set the model to training mode
         self.to(device)
 
         # this mode handling is critical to ensure that the dropout is only applied during training
